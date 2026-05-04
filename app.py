@@ -1,24 +1,29 @@
 import psycopg2
-import time
 import os
+import time
 
-time.sleep(3)
+# Ждём пока БД проснётся
+time.sleep(5)
 
-conn = psycopg2.connect(
-
-    host=os.getenv("DB_HOST"),
-    database=os.getenv("DB_NAME"),
-    user=os.getenv("DB_USER"),
-    password=os.getenv("DB_PASSWORD")
-
-)
+for attempt in range(5):
+    try:
+        conn = psycopg2.connect(
+            host=os.getenv("DB_HOST"),
+            database=os.getenv("DB_NAME"),
+            user=os.getenv("DB_USER"),
+            password=os.getenv("DB_PASSWORD")
+        )
+        break
+    except psycopg2.OperationalError:
+        print(f"Waiting for DB... attempt {attempt+1}/5")
+        time.sleep(3)
+else:
+    raise Exception("Could not connect to DB after 5 attempts")
 
 cur = conn.cursor()
 
 cur.execute("""
-
     CREATE TABLE IF NOT EXISTS final (
-    
         id SERIAL PRIMARY KEY,
         name TEXT,
         ip TEXT,
@@ -29,7 +34,7 @@ cur.execute("""
 
 cur.execute(
     "INSERT INTO final (name, ip, ips) VALUES (%s, %s, %s)",
-    ("sex", "even", "67")
+    ("github-actions", "ci-cd", "works")
 )
 
 conn.commit()
