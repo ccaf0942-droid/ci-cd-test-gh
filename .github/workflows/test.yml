@@ -1,0 +1,17 @@
+name: Test app
+
+on:
+  push:
+    branches: [master]
+
+jobs:
+  run_app:
+    runs-on: ubuntu-latest
+    container:
+      image: python:3.11-slim
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install dependencies
+        run: pip install psycopg2-binary
+      - name: Run app
+        run: python app.py
