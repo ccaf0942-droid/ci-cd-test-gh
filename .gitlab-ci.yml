@@ -1,0 +1,9 @@
+stages:
+  - test
+
+run_app:
+  stage: test
+  image: python:3.11-slim
+  script:
+    - pip install psycopg2-binary
+    - python app.py
