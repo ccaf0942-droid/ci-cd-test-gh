@@ -1,4 +1,4 @@
-name: Test app
+name: Test app with PostgreSQL
 
 on:
   push:
@@ -7,8 +7,26 @@ on:
 jobs:
   run_app:
     runs-on: ubuntu-latest
-    container:
-      image: python:3.11-slim
+    
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: secret
+          POSTGRES_DB: q
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DB_HOST: postgres
+      DB_NAME: q
+      DB_USER: postgres
+      DB_PASSWORD: secret
+
     steps:
       - uses: actions/checkout@v4
       - name: Install dependencies
